@@ -2,14 +2,58 @@
 
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Send, Loader2, Info } from 'lucide-react';
+import { Send, Loader2, Info, X, LogOut } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 interface Message {
   role: 'user' | 'model';
   content: string;
 }
 
+const KRITIK_TARIHLER_DATA: Record<string, { title: string; date: string; description: string; imagePath: string }> = {
+  '19_mayis': {
+    title: "Samsun'a Çıkış",
+    date: "19 MAYIS 1919",
+    description: "Mustafa Kemal Paşa'nın 9. Ordu Müfettişi olarak Bandırma Vapuru ile Samsun'a ayak bastığı bu gün, Milli Mücadele'nin fiili olarak başladığı ve kurtuluş meşalesinin yakıldığı tarihi bir andır. Yokluk ve tükenmişlik içindeki bir milletin yeniden dirilişinin ilk adımıdır.",
+    imagePath: "/images/19_mayis.png"
+  },
+  '23_nisan': {
+    title: "Meclis'in Açılışı",
+    date: "23 NİSAN 1920",
+    description: "Ankara'da, milletin bağımsızlığını kendi azim ve kararının kurtaracağı ilkesiyle Türkiye Büyük Millet Meclisi açıldı. 'Egemenlik kayıtsız şartsız milletindir' şiarıyla yeni Türk devletinin temelleri atılmış, bağımsızlık savaşı meşru bir zemine oturtulmuştur.",
+    imagePath: "/images/23_nisan.png"
+  },
+  '30_agustos': {
+    title: "Büyük Taarruz",
+    date: "30 AĞUSTOS 1922",
+    description: "Mustafa Kemal Paşa'nın Başkomutanlığında 26 Ağustos'ta başlayan ve 30 Ağustos'ta Dumlupınar'da zaferle sonuçlanan bu taarruz, işgal güçlerinin Anadolu'dan kesin olarak temizlenmesini sağlamış ve bağımsızlığımızı perçinlemiştir.",
+    imagePath: "/images/30_agustos.png"
+  }
+};
+
 export default function ChatPage() {
+  const [selectedTarih, setSelectedTarih] = useState<string | null>(null);
+  const [user, setUser] = useState<{name: string, email: string} | null>(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then(res => res.json())
+      .then(data => {
+        if (data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    setUser(null);
+    router.refresh();
+  };
+
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'model',
@@ -65,7 +109,38 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="h-full w-full bg-[#0a0a0b] text-[#e2e2e2] flex flex-col font-sans">
+    <div className="h-full w-full bg-[#0a0a0b] text-[#e2e2e2] flex flex-col font-sans relative">
+      {/* Modal Overlay */}
+      {selectedTarih && KRITIK_TARIHLER_DATA[selectedTarih] && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+          <div className="relative w-full max-w-2xl bg-[#121214] border border-[#c5a059]/30 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <button 
+              onClick={() => setSelectedTarih(null)}
+              className="absolute top-4 right-4 z-10 w-8 h-8 flex items-center justify-center bg-black/50 hover:bg-[#c5a059] hover:text-black text-white rounded-full transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+            <div className="relative w-full h-64 sm:h-80 shrink-0">
+              <img 
+                src={KRITIK_TARIHLER_DATA[selectedTarih].imagePath} 
+                alt={KRITIK_TARIHLER_DATA[selectedTarih].title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#121214] via-[#121214]/40 to-transparent"></div>
+              <div className="absolute bottom-6 left-6 right-6">
+                <p className="text-[#c5a059] font-bold text-sm tracking-widest mb-1 drop-shadow-md">{KRITIK_TARIHLER_DATA[selectedTarih].date}</p>
+                <h2 className="text-3xl font-serif text-white drop-shadow-md">{KRITIK_TARIHLER_DATA[selectedTarih].title}</h2>
+              </div>
+            </div>
+            <div className="p-6 sm:p-8 overflow-y-auto">
+              <p className="text-white/80 leading-relaxed text-lg font-serif">
+                {KRITIK_TARIHLER_DATA[selectedTarih].description}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Top Navigation Bar */}
       <nav className="h-20 border-b border-white/10 bg-[#121214] flex items-center justify-between px-6 lg:px-10 shrink-0">
         <div className="flex items-center gap-4">
@@ -77,10 +152,29 @@ export default function ChatPage() {
             <p className="text-[10px] text-[#c5a059] uppercase tracking-[0.2em] opacity-80">Gazi Mustafa Kemal Atatürk ile Tarih Yolculuğu</p>
           </div>
         </div>
-        <div className="hidden sm:flex gap-8 text-[11px] uppercase tracking-widest text-white/60">
+        <div className="hidden sm:flex items-center gap-8 text-[11px] uppercase tracking-widest text-white/60">
           <span className="border-b border-[#c5a059] text-white py-1">Mülakat</span>
           <span className="hover:text-white cursor-pointer py-1 transition-colors">Arşiv</span>
           <span className="hover:text-white cursor-pointer py-1 transition-colors">Haritalar</span>
+          
+          <div className="ml-4 flex items-center gap-4 border-l border-white/10 pl-6">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="flex flex-col text-right">
+                  <span className="text-white font-semibold normal-case text-xs">{user.name}</span>
+                  <span className="text-[9px] text-[#c5a059] opacity-80 normal-case">{user.email}</span>
+                </div>
+                <button onClick={handleLogout} className="p-2 hover:bg-white/5 rounded-full transition-colors text-white/50 hover:text-white" title="Çıkış Yap">
+                  <LogOut className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link href="/login" className="hover:text-white transition-colors py-2">Giriş</Link>
+                <Link href="/register" className="bg-[#c5a059] text-black px-4 py-2 rounded hover:bg-[#d4af37] font-bold transition-colors">Kayıt Ol</Link>
+              </div>
+            )}
+          </div>
         </div>
       </nav>
 
@@ -90,20 +184,29 @@ export default function ChatPage() {
           <section>
             <h3 className="text-[11px] uppercase tracking-[0.15em] text-[#c5a059] mb-6">Kritik Tarihler</h3>
             <div className="space-y-6">
-              <div className="relative pl-6 border-l border-white/10">
-                <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-[#c5a059]"></div>
-                <p className="text-xs font-bold">19 MAYIS 1919</p>
-                <p className="text-[11px] text-white/50">Samsun'a Çıkış</p>
+              <div 
+                onClick={() => setSelectedTarih('19_mayis')}
+                className="relative pl-6 border-l border-white/10 cursor-pointer group hover:border-[#c5a059] transition-colors"
+              >
+                <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-[#c5a059] group-hover:shadow-[0_0_8px_rgba(197,160,89,0.8)] transition-shadow"></div>
+                <p className="text-xs font-bold group-hover:text-[#c5a059] transition-colors">19 MAYIS 1919</p>
+                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Samsun'a Çıkış</p>
               </div>
-              <div className="relative pl-6 border-l border-white/10">
-                <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-white/20"></div>
-                <p className="text-xs font-bold">23 NİSAN 1920</p>
-                <p className="text-[11px] text-white/50">Meclis'in Açılışı</p>
+              <div 
+                onClick={() => setSelectedTarih('23_nisan')}
+                className="relative pl-6 border-l border-white/10 cursor-pointer group hover:border-[#c5a059] transition-colors"
+              >
+                <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-white/20 group-hover:bg-[#c5a059] group-hover:shadow-[0_0_8px_rgba(197,160,89,0.8)] transition-all"></div>
+                <p className="text-xs font-bold group-hover:text-[#c5a059] transition-colors">23 NİSAN 1920</p>
+                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Meclis'in Açılışı</p>
               </div>
-              <div className="relative pl-6 border-l border-white/10">
-                <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-white/20"></div>
-                <p className="text-xs font-bold">30 AĞUSTOS 1922</p>
-                <p className="text-[11px] text-white/50">Büyük Taarruz</p>
+              <div 
+                onClick={() => setSelectedTarih('30_agustos')}
+                className="relative pl-6 border-l border-white/10 cursor-pointer group hover:border-[#c5a059] transition-colors"
+              >
+                <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-white/20 group-hover:bg-[#c5a059] group-hover:shadow-[0_0_8px_rgba(197,160,89,0.8)] transition-all"></div>
+                <p className="text-xs font-bold group-hover:text-[#c5a059] transition-colors">30 AĞUSTOS 1922</p>
+                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Büyük Taarruz</p>
               </div>
             </div>
           </section>
