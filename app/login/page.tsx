@@ -47,7 +47,7 @@ export default function LoginPage() {
             <span className="text-[#c5a059] font-serif text-2xl italic">A</span>
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-white">Hoş Geldiniz</h1>
-          <p className="text-sm text-white/50 mt-2">Milli Mücadele Sohbetleri'ne devam etmek için giriş yapın.</p>
+          <p className="text-sm text-white/50 mt-2">Milli Mücadele Sohbetleri&apos;ne devam etmek için giriş yapın.</p>
         </div>
 
         {error && (

@@ -121,6 +121,7 @@ export default function ChatPage() {
               <X className="w-4 h-4" />
             </button>
             <div className="relative w-full h-64 sm:h-80 shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src={KRITIK_TARIHLER_DATA[selectedTarih].imagePath} 
                 alt={KRITIK_TARIHLER_DATA[selectedTarih].title}
@@ -190,7 +191,7 @@ export default function ChatPage() {
               >
                 <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-[#c5a059] group-hover:shadow-[0_0_8px_rgba(197,160,89,0.8)] transition-shadow"></div>
                 <p className="text-xs font-bold group-hover:text-[#c5a059] transition-colors">19 MAYIS 1919</p>
-                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Samsun'a Çıkış</p>
+                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Samsun&apos;a Çıkış</p>
               </div>
               <div 
                 onClick={() => setSelectedTarih('23_nisan')}
@@ -198,7 +199,7 @@ export default function ChatPage() {
               >
                 <div className="absolute -left-[4.5px] top-0 w-2 h-2 rounded-full bg-white/20 group-hover:bg-[#c5a059] group-hover:shadow-[0_0_8px_rgba(197,160,89,0.8)] transition-all"></div>
                 <p className="text-xs font-bold group-hover:text-[#c5a059] transition-colors">23 NİSAN 1920</p>
-                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Meclis'in Açılışı</p>
+                <p className="text-[11px] text-white/50 group-hover:text-white/80 transition-colors">Meclis&apos;in Açılışı</p>
               </div>
               <div 
                 onClick={() => setSelectedTarih('30_agustos')}
@@ -212,7 +213,7 @@ export default function ChatPage() {
           </section>
           <section className="mt-auto">
             <div className="p-4 rounded border border-white/5 bg-white/[0.02] text-[11px] leading-relaxed">
-              <p className="text-white/40 italic">"Milletin bağımsızlığını yine milletin azim ve kararı kurtaracaktır."</p>
+              <p className="text-white/40 italic">&quot;Milletin bağımsızlığını yine milletin azim ve kararı kurtaracaktır.&quot;</p>
             </div>
           </section>
         </aside>
@@ -312,7 +313,7 @@ export default function ChatPage() {
             </div>
             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-lg opacity-40">
               <h4 className="text-xs font-bold text-white/90 mb-1">Güney Cephesi</h4>
-              <p className="text-[11px] text-white/40 leading-snug">Kuvâ-yi Milliye'nin işgalci güçlere karşı yerel direnişi.</p>
+              <p className="text-[11px] text-white/40 leading-snug">Kuvâ-yi Milliye&apos;nin işgalci güçlere karşı yerel direnişi.</p>
             </div>
             <div className="p-4 border border-white/5 bg-white/[0.02] rounded-lg opacity-40">
               <h4 className="text-xs font-bold text-white/90 mb-1">Doğu Cephesi</h4>
